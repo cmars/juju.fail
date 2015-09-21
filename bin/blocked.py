@@ -2,8 +2,18 @@
 
 import json
 import datetime
+import os
 
 from citools import check_blockers
+
+from gi.repository import Notify
+
+#watched_branches = ['1.22', '1.23', '1.24', '1.25', 'master']
+watched_branches = ['master']
+cacheFile = os.path.join(os.getenv("HOME"), ".cache", "juju-fail", "last.json")
+cacheDir = os.path.dirname(cacheFile)
+if not os.path.exists(cacheDir):
+    os.makedirs(cacheDir)
 
 data = {}
 
@@ -26,6 +36,20 @@ for b in ['1.22', '1.23', '1.24', '1.25', 'master']:
         data[b].append({'id': bug, 'url': 'http://pad.lv/%s' % bug,
                         'title': format_title(bdata.title), 'status': bdata.status})
 
+last = {}
+if os.path.exists(cacheFile):
+    with open(cacheFile, "r") as f:
+        last = json.load(f)
 
-print(json.dumps({'updated': str(datetime.datetime.utcnow()), 'status': data},
-                 indent=2))
+for k, v in data.iteritems():
+    title = v and "juju.fail" or "juju.win"
+    status = v and "blocked" or "clear"
+    if last.get(k, "") != v:
+        msg = "%s is %s:\n%s" % (k, status,
+            " ".join([buginfo.get("url") for buginfo in v if "url" in buginfo]))
+        Notify.init(title)
+        Notify.Notification.new(msg).show()
+
+with open(cacheFile, "w") as f:
+    last = json.dump(data, f)
+
