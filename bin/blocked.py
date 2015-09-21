@@ -41,14 +41,20 @@ if os.path.exists(cacheFile):
     with open(cacheFile, "r") as f:
         last = json.load(f)
 
+Notify.init("juju-fail")
+
 for k, v in data.iteritems():
     title = v and "juju.fail" or "juju.win"
     status = v and "blocked" or "clear"
     if last.get(k, "") != v:
         msg = "%s is %s:\n%s" % (k, status,
             " ".join([buginfo.get("url") for buginfo in v if "url" in buginfo]))
-        Notify.init(title)
-        Notify.Notification.new(msg).show()
+        Notify.set_app_name(title)
+        note = Notify.Notification.new(msg)
+        note.set_urgency(1)
+        note.show()
+
+Notify.uninit()
 
 with open(cacheFile, "w") as f:
     last = json.dump(data, f)
