@@ -50,8 +50,8 @@ for k, v in data.iteritems():
         msg = "%s is %s:\n%s" % (k, status,
             " ".join([buginfo.get("url") for buginfo in v if "url" in buginfo]))
         Notify.set_app_name(title)
-        note = Notify.Notification.new(msg)
-        note.set_urgency(1)
+        note = Notify.Notification.new(title, msg)
+        note.set_timeout(900000)
         note.show()
 
 Notify.uninit()
