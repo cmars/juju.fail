@@ -3,5 +3,10 @@
 SCRIPT_DIR="`dirname \"$0\"`"                    # relative
 SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
 
+if [ -z "$DISPLAY" ]; then
+	# For example, running from cron...
+	export DISPLAY=:0.0
+fi
+
 export PYTHONPATH=$SCRIPT_DIR
 $SCRIPT_DIR/bin/blocked.py
