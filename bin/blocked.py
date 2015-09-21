@@ -24,7 +24,7 @@ def format_title(s):
 
 lp = check_blockers.Launchpad.login_anonymously('juju.fail', 'production', version='devel')
 
-for b in ['1.22', '1.23', '1.24', '1.25', 'master']:
+for b in watched_branches:
     uhohs = check_blockers.get_lp_bugs(lp, b)
 
     data[b] = []
